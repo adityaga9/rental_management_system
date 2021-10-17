@@ -1,0 +1,60 @@
+create table owner(o_ownerid varchar(50) NOT NULL,o_ownername varchar(30),o_password varchar(30),o_contactno number(10));
+
+create table buyer(b_buyerid varchar(50),b_buyername varchar(20),b_password varchar(20),b_contactno number(10),address varchar(20));
+
+create table register(r_houseid varchar(20) UNIQUE,r_ownerid varchar(50) UNIQUE,r_contactno number(10),r_address varchar(30),r_rentamount int,r_rooms number(20));
+
+create table interest(i_buyerid varchar(50) UNIQUE,i_houseid varchar(20)UNIQUE);
+
+create table feedback(f_houseid varchar(20) UNIQUE,f_buyerid varchar(50) UNIQUE,feedback varchar(100),f_rating int);
+
+create table ownersolution(o_ownerid varchar(50),solution varchar(100));
+
+create table buyerquery(q_buyerid varchar(50),query varchar(100));
+
+create table admin(userid varchar(50),password varchar(50));
+
+alter table owner add constraint p1 primary key(o_ownerid);
+alter table buyer add constraint p2 primary key(b_buyerid);
+alter table register add constraint p3 primary key(r_houseid);
+alter table interest add constraint p4 primary key(i_buyerid,i_houseid);
+alter table feedback add constraint p5 primary key(f_houseid,f_buyerid);
+alter table ownersolution add constraint p10 primary key(o_ownerid);
+alter table buyerquery add constraint p9 primary key(q_buyerid);
+
+alter table register add constraint f1 foreign key(r_ownerid) references owner(o_ownerid) on delete cascade;
+alter table interest add constraint f2 foreign key(i_buyerid) references buyer(b_buyerid) on delete cascade;
+alter table interest add constraint f3 foreign key(i_houseid) references register(r_houseid) on delete cascade;
+alter table feedback add constraint f4 foreign key(f_houseid) references register(r_houseid) on delete cascade;
+alter table feedback add constraint f5 foreign key(f_buyerid) references buyer(b_buyerid) on delete cascade;
+alter table buyerquery add constraint f6 foreign key(q_buyerid) references buyer(b_buyerid);
+alter table ownersolution add constraint f7 foreign key(o_ownerid) references owner(o_ownerid);
+alter table buyerquery add constraint f10 foreign key(q_buyerid) references buyer(b_buyerid);
+
+
+
+
+
+-------------------------------------------TRIGGEER-------------------------------------
+
+CREATE OR REPLACE TRIGGER ctr
+BEFORE INSERT OR UPDATE
+ON REGISTER
+FOR EACH ROW
+BEGIN
+IF(:NEW.R_RENTAMOUNT<(1000)) THEN
+RAISE_APPLICATION_ERROR(-20002,'RENT AMOUNT CANNOT BE LESS THAN 1000');
+END IF;
+END;
+
+
+
+
+---------------------------------------------- stored procedure----------------------------------
+CREATE OR REPLACE PROCEDURE "PROC"
+(O_OWNERNAME IN VARCHAR,
+O_PASSWORD IN VARCHAR,
+O_CONTACTNO IN NUMBER)
+IS BEGIN
+INSERT INTO OWNER VALUES(O_Ownerid,O_OWNERNAME,O_PASSWORD,O_CONTACTNO);
+END;
